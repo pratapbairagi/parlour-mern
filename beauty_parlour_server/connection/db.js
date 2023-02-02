@@ -11,7 +11,7 @@ const dbConnection = async (url) => {
             console.log("db error",err);
         })
     } catch (error) {
-        throw new Error(error)
+        // throw new Error(error)
         console.log("db function error", error)
     }
 }
