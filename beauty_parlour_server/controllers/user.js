@@ -43,8 +43,10 @@ export const register = asyncCatch( async (req, res, next) => {
         const token = await user.generateToken();
 
         const cookieOption = {
-            httpOnly: true,
-            expire: Date.now() + (24 * 60 * 60 * 1000)
+            httpOnly : true,
+            expires : new Date(Date.now() + (24 * 60 * 60 * 1000)),
+            secure : true,
+            sameSite : "none"
         }
         
        return res.status(201).cookie("jwt", token, cookieOption).json({
@@ -78,7 +80,9 @@ export const login = asyncCatch ( async (req, res, next) => {
 
         let options = {
             httpOnly : true,
-            expire : Date.now() + (24 * 60 * 60 * 1000)
+            expires : new Date(Date.now() + (24 * 60 * 60 * 1000)),
+            secure : true,
+            sameSite : "none"
         }
 
        return res.status(200).cookie("jwt", token, options).json({
@@ -160,7 +164,6 @@ export const logoutUser = asyncCatch ( async (req, res, next) => {
 })
 
 // delete user
-
 export const deleteUser = asyncCatch ( async ( req, res, next ) => {
     const {id} = req.params
 

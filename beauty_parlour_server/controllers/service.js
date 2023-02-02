@@ -7,7 +7,11 @@ import AppError from "../utils/errorHandler.js";
 export const getAllServices = asyncCatch ( async (req, res, next) => {
     
         const services = await Service.find();
-        res.status(200).json(services)
+        res.status(200).json({
+            success : true,
+            message : "fetched all services successfully !",
+            services
+        })
    
 })
 
@@ -52,16 +56,19 @@ export const getSingleService = asyncCatch(async (req, res, next) => {
     const isServiceExist = await Service.findById(id);
 
     if (isServiceExist) {
-        res.status(200).json(isServiceExist);
+        res.status(200).json({
+            success : true,
+            message : "Fetched sevice successfully !",
+            service : isServiceExist
+        });
     }
     else {
-        throw new Error("Service not found !", 404)
+        return next( new AppError("Service not found !", 404) )
     }
 
 })
 
-export const editService = async (req, res, next) => {
-    try {
+export const editService = asyncCatch ( async (req, res, next) => {
         const isServiceExist = await Service.findById(req.body._id);
 
         if (isServiceExist) {
@@ -86,7 +93,7 @@ export const editService = async (req, res, next) => {
                 res.status(200).json({
                     success: true,
                     message: "Service updated successfully !",
-                    editedService
+                    service : editedService
                 });
             } else {
                 let editedService = await Service.findByIdAndUpdate(req.body._id, req.body);
@@ -94,34 +101,31 @@ export const editService = async (req, res, next) => {
                 res.status(200).json({
                     success: true,
                     message: "Service updated successfully !",
-                    editedService
+                    service : editedService
                 });
             }
         }
         else {
-            throw new Error("Service not found !", 404)
+            return next( new AppError( "Service not found !", 404 ) )
         }
+})
 
+export const deleteService = asyncCatch( async (req, res, next) => {
 
-    } catch (error) {
-        throw new Error(error)
-    }
-}
-
-export const deleteService = async (req, res, next) => {
-    try {
         const isServiceExist = await Service.findById(req.params.id);
 
         if (isServiceExist) {
             await cloudinary.uploader.destroy(isServiceExist.images.public_id);
             await Service.findByIdAndDelete(req.params.id);
             const services = await Service.find();
-            res.status(200).json(services);
+            res.status(200).json({
+                success : true,
+                message : "Service deleted successfully !",
+                services
+            });
         }
         else {
-            throw new Error("The service you are trying to delete is not found !", 404)
+            return  next( new AppError("The service you are trying to delete is not found !", 404))
         }
-    } catch (error) {
-        console.log("error",error)
-    }
-}
+   
+})
